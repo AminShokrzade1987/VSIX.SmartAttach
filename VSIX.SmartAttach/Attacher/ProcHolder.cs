@@ -18,6 +18,8 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         public string AppPool { get; private set; }
         public DateTime? StartTime { get; private set; } = null;
 
+        public string ProcessPath { get; private set; }
+
         static ExcludedProcessesManager excludedProcessesManager = new ExcludedProcessesManager();
         public static ExcludedProcessesManager ExcludedProcessesManager => excludedProcessesManager;
 
@@ -49,7 +51,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                             var appPool = GetAppPool(commandLine.ToString());
 
                             if (appPool != null) AppPool += appPool;
-                            
+
                             var dotNetCoreApp = GetDotNetCoreApp(prc, commandLine.ToString());
 
                             if (dotNetCoreApp != null) AppPool += dotNetCoreApp;
@@ -72,6 +74,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                 if (process == null) return null;
 
                 var startTime = ExcludedProcessesManager.CheckAndReturnStartTime(process);
+                var ProcessPath = process.Name;
 
                 if (startTime == null) return null;
 
@@ -80,6 +83,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                     if (returnProcessHolder.Process.Name == process.Name)
                     {
                         returnProcessHolder.StartTime = startTime;
+                        returnProcessHolder.ProcessPath = ProcessPath;
                         return returnProcessHolder;
                     }
                 }
@@ -89,6 +93,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                 {
                     alreadyCheckedProcesses.TryAdd(process.ProcessID, returnProcessHolder);
                     returnProcessHolder.StartTime = startTime;
+                    returnProcessHolder.ProcessPath = ProcessPath;
                     return returnProcessHolder;
                 }
 
@@ -106,9 +111,9 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             if (Process == null) return "NULL";
 
             if (StartTime.HasValue == false)
-                return string.Format("{1} ({0})", Process.ProcessID, AppPool, Process.TransportQualifier).Replace("Geeks@", "");
+                return string.Format("{1} ({0}) ({2})", Process.ProcessID, AppPool, Process.TransportQualifier, Process.Name).Replace("Geeks@", "");
 
-            return AppPool.PadRight(25, ' ') + string.Format(" ({0}: {1})", Process.ProcessID, MSharp::System.MSharpExtensions.ToTimeDifferenceString(StartTime.Value, 1)).Remove("Geeks@");
+            return AppPool.PadRight(25, ' ') + (string.Format(" ({0}: {1})", Process.ProcessID, MSharp::System.MSharpExtensions.ToTimeDifferenceString(StartTime.Value, 1)).Remove("Geeks@")).PadRight(35, ' ') + Process.Name;
         }
 
         string GetAppPool(string fullCommandLine)

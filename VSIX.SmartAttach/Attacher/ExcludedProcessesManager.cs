@@ -63,10 +63,26 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         {
             try
             {
-                    if (processFullName.Contains("dotnet.exe")) return true;
+                if (processFullName.Contains("dotnet.exe")) return true;
+                var modules = process.Modules.Cast<ProcessModule>().Where(
+                m => m.ModuleName.StartsWith("mscor", StringComparison.InvariantCultureIgnoreCase));
 
-                    var modules = process.Modules.Cast<ProcessModule>().Where(
-                    m => m.ModuleName.StartsWith("mscor", StringComparison.InvariantCultureIgnoreCase));
+                return modules.Any();
+            }
+            catch (Exception e)
+            {
+                AddExcludedNoneDotNetProcesses(processFullName);
+
+                return false;
+            }
+        }
+
+        bool IsCoreProcess(System.Diagnostics.Process process, string processFullName)
+        {
+            try
+            {
+                var modules = process.Modules.Cast<ProcessModule>().Where(
+                m => m.ModuleName.StartsWith("coreclr", StringComparison.InvariantCultureIgnoreCase));
 
                 return modules.Any();
             }
@@ -84,6 +100,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
             if (IsEnabled)
             {
+
                 if (ExcludedNoneDotNetProcesses.Any(x => x.ToLower() == processFullName)) return null;
             }
 
@@ -100,7 +117,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
                 if (ExcludedProcessNames.Any(x => tp.ProcessName.ToLower().StartsWith(x))) return null;
 
-                if (WebServerProcessNames.Any(n => processFullName.IndexOf(n) >= 0) == false && IsDotNetProcess(tp, processFullName) == false)
+                if (WebServerProcessNames.Any(n => processFullName.IndexOf(n) >= 0) == false && IsDotNetProcess(tp, processFullName) == false && IsCoreProcess(tp, processFullName) == false)
                     return null;
 
                 return tp.StartTime;
@@ -131,10 +148,10 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
             if (ShouldWrtieToSetting)
             {
-                var oldprocesses = VSIX.SmartAttach.Properties.Settings.Default.ExcludedNoneDotNetProcess.Split(new[]{'\n'}, StringSplitOptions.RemoveEmptyEntries);
-                
-                var allProcesses =  string.Join("\n", oldprocesses.Union(tempExcludedNoneDotNetProcesses).Distinct());
-                
+                var oldprocesses = VSIX.SmartAttach.Properties.Settings.Default.ExcludedNoneDotNetProcess.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                var allProcesses = string.Join("\n", oldprocesses.Union(tempExcludedNoneDotNetProcesses).Distinct());
+
                 VSIX.SmartAttach.Properties.Settings.Default.ExcludedNoneDotNetProcess = allProcesses;
                 VSIX.SmartAttach.Properties.Settings.Default.Save();
             }

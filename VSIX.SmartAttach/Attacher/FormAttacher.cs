@@ -9,6 +9,7 @@ using EnvDTE80;
 using Geeks.VSIX.SmartAttach.Base;
 using Geeks.VSIX.SmartAttach.Properties;
 using GeeksAddin;
+using System.IO;
 
 namespace Geeks.VSIX.SmartAttach.Attacher
 {
@@ -31,14 +32,14 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
         void ReloadListOfRemoteMachines()
         {
-            lstRemoteMachines.Items.Clear();
+            //lstRemoteMachines.Items.Clear();
             var machinesString = Settings.Default.RemoteMachines;
             if (!machinesString.HasValue())
                 return;
 
             var machines = GetRemoteMachineNames(machinesString);
-            foreach (var m in machines)
-                lstRemoteMachines.Items.Add(m);
+            //foreach (var m in machines)
+            //    lstRemoteMachines.Items.Add(m);
         }
 
         Task flushTask;
@@ -55,7 +56,6 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             using (var iis = new IIS())
             {
                 var processes = GetWorkerProcesses().OfType<EnvDTE80.Process2>().ToList();
-
                 if (CheckUser(processes) == false) return;
 
                 if (flushTask != null) Task.WaitAll(flushTask);
@@ -282,27 +282,27 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
         void DeleteCurrentRemoteMachine()
         {
-            if (lstRemoteMachines.SelectedIndex >= 0)
-            {
-                lstRemoteMachines.Items.RemoveAt(lstRemoteMachines.SelectedIndex);
+            //if (lstRemoteMachines.SelectedIndex >= 0)
+            //{
+            //    lstRemoteMachines.Items.RemoveAt(lstRemoteMachines.SelectedIndex);
 
-                Settings.Default.RemoteMachines = "";
-                foreach (var m in lstRemoteMachines.Items)
-                    Settings.Default.RemoteMachines += m + "|";
-                Settings.Default.Save();
+            //    Settings.Default.RemoteMachines = "";
+            //    foreach (var m in lstRemoteMachines.Items)
+            //        Settings.Default.RemoteMachines += m + "|";
+            //    Settings.Default.Save();
 
-                ReloadListOfRemoteMachines();
-            }
+            //    ReloadListOfRemoteMachines();
+            //}
         }
 
         void btnAdd_Click(object sender, EventArgs e)
         {
-            if (txtMachineName.Text.HasValue())
-            {
-                Settings.Default.RemoteMachines += "|" + txtMachineName.Text;
-                Settings.Default.Save();
-                ReloadListOfRemoteMachines();
-            }
+            ////if (txtMachineName.Text.HasValue())
+            //{
+            //    Settings.Default.RemoteMachines += "|" + txtMachineName.Text;
+            //    Settings.Default.Save();
+            //    ReloadListOfRemoteMachines();
+            //}
         }
 
         void ProcessListLoader_DoWork(object sender, DoWorkEventArgs e) => RefreshList();
@@ -328,7 +328,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             if (e.KeyData != Keys.Delete) return;
 
             if (tabControl.SelectedTab == tbpgWorkers) KillSelected();
-            if (tabControl.SelectedTab == tbpgRemoteMachines) DeleteCurrentRemoteMachine();
+            //if (tabControl.SelectedTab == tbpgRemoteMachines) DeleteCurrentRemoteMachine();
         }
 
         void checkBoxExcludeMSharp_CheckedChanged(object sender, EventArgs e) => RefreshList();
