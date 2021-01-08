@@ -31,18 +31,18 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             this.ProcessListLoader = new System.ComponentModel.BackgroundWorker();
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.tbpgWorkers = new System.Windows.Forms.TabPage();
-            this.listBoxProcess = new System.Windows.Forms.ListBox();
-            this.btnAttach = new System.Windows.Forms.Button();
-            this.btnAttachToAll = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
-            this.btnOriginal = new System.Windows.Forms.Button();
-            this.checkBoxExcludeMSharp = new System.Windows.Forms.CheckBox();
             this.txtSearchProcess = new System.Windows.Forms.TextBox();
-            this.tabControl = new System.Windows.Forms.TabControl();
+            this.checkBoxExcludeMSharp = new System.Windows.Forms.CheckBox();
+            this.btnOriginal = new System.Windows.Forms.Button();
+            this.btnRefresh = new System.Windows.Forms.Button();
+            this.btnAttachToAll = new System.Windows.Forms.Button();
+            this.btnAttach = new System.Windows.Forms.Button();
+            this.listBoxProcess = new System.Windows.Forms.ListBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.statusBar.SuspendLayout();
-            this.tbpgWorkers.SuspendLayout();
-            this.tabControl.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // ProcessListLoader
@@ -66,118 +66,118 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             this.lblStatus.Size = new System.Drawing.Size(42, 17);
             this.lblStatus.Text = "Ready.";
             // 
-            // tbpgWorkers
+            // txtSearchProcess
             // 
-            this.tbpgWorkers.Controls.Add(this.txtSearchProcess);
-            this.tbpgWorkers.Controls.Add(this.checkBoxExcludeMSharp);
-            this.tbpgWorkers.Controls.Add(this.btnOriginal);
-            this.tbpgWorkers.Controls.Add(this.btnRefresh);
-            this.tbpgWorkers.Controls.Add(this.btnAttachToAll);
-            this.tbpgWorkers.Controls.Add(this.btnAttach);
-            this.tbpgWorkers.Controls.Add(this.listBoxProcess);
-            this.tbpgWorkers.Location = new System.Drawing.Point(4, 22);
-            this.tbpgWorkers.Name = "tbpgWorkers";
-            this.tbpgWorkers.Padding = new System.Windows.Forms.Padding(3);
-            this.tbpgWorkers.Size = new System.Drawing.Size(598, 337);
-            this.tbpgWorkers.TabIndex = 0;
-            this.tbpgWorkers.Text = "Worker Procs";
-            this.tbpgWorkers.UseVisualStyleBackColor = true;
+            this.txtSearchProcess.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.txtSearchProcess.Location = new System.Drawing.Point(12, 15);
+            this.txtSearchProcess.Name = "txtSearchProcess";
+            this.txtSearchProcess.Size = new System.Drawing.Size(496, 20);
+            this.txtSearchProcess.TabIndex = 10;
+            this.txtSearchProcess.TextChanged += new System.EventHandler(this.txtSearchProcess_TextChanged);
+            // 
+            // checkBoxExcludeMSharp
+            // 
+            this.checkBoxExcludeMSharp.AutoSize = true;
+            this.checkBoxExcludeMSharp.Enabled = false;
+            this.checkBoxExcludeMSharp.Location = new System.Drawing.Point(520, 18);
+            this.checkBoxExcludeMSharp.Name = "checkBoxExcludeMSharp";
+            this.checkBoxExcludeMSharp.Size = new System.Drawing.Size(83, 17);
+            this.checkBoxExcludeMSharp.TabIndex = 9;
+            this.checkBoxExcludeMSharp.Text = "Exclude M#";
+            this.checkBoxExcludeMSharp.UseVisualStyleBackColor = true;
+            this.checkBoxExcludeMSharp.Visible = false;
+            this.checkBoxExcludeMSharp.CheckedChanged += new System.EventHandler(this.checkBoxExcludeMSharp_CheckedChanged);
+            // 
+            // btnOriginal
+            // 
+            this.btnOriginal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOriginal.Location = new System.Drawing.Point(420, 19);
+            this.btnOriginal.Name = "btnOriginal";
+            this.btnOriginal.Size = new System.Drawing.Size(150, 35);
+            this.btnOriginal.TabIndex = 8;
+            this.btnOriginal.Text = "Original Attach to &Process...";
+            this.btnOriginal.UseVisualStyleBackColor = true;
+            this.btnOriginal.Click += new System.EventHandler(this.btnOriginal_Click);
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnRefresh.Location = new System.Drawing.Point(203, 19);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(80, 35);
+            this.btnRefresh.TabIndex = 7;
+            this.btnRefresh.Text = "&Refresh";
+            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
+            // btnAttachToAll
+            // 
+            this.btnAttachToAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAttachToAll.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnAttachToAll.Location = new System.Drawing.Point(93, 19);
+            this.btnAttachToAll.Name = "btnAttachToAll";
+            this.btnAttachToAll.Size = new System.Drawing.Size(104, 35);
+            this.btnAttachToAll.TabIndex = 6;
+            this.btnAttachToAll.Text = "Attach to &All";
+            this.btnAttachToAll.UseVisualStyleBackColor = true;
+            this.btnAttachToAll.Click += new System.EventHandler(this.btnAttachToAll_Click);
+            // 
+            // btnAttach
+            // 
+            this.btnAttach.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAttach.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnAttach.Enabled = false;
+            this.btnAttach.Location = new System.Drawing.Point(12, 19);
+            this.btnAttach.Name = "btnAttach";
+            this.btnAttach.Size = new System.Drawing.Size(75, 35);
+            this.btnAttach.TabIndex = 5;
+            this.btnAttach.Text = "A&ttach";
+            this.btnAttach.UseVisualStyleBackColor = true;
+            this.btnAttach.Click += new System.EventHandler(this.btnAttach_Click);
             // 
             // listBoxProcess
             // 
             this.listBoxProcess.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.listBoxProcess.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.listBoxProcess.Font = new System.Drawing.Font("Consolas", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxProcess.FormattingEnabled = true;
-            this.listBoxProcess.ItemHeight = 15;
-            this.listBoxProcess.Location = new System.Drawing.Point(8, 37);
+            this.listBoxProcess.ItemHeight = 18;
+            this.listBoxProcess.Location = new System.Drawing.Point(12, 46);
             this.listBoxProcess.Name = "listBoxProcess";
             this.listBoxProcess.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listBoxProcess.Size = new System.Drawing.Size(582, 199);
+            this.listBoxProcess.Size = new System.Drawing.Size(582, 238);
             this.listBoxProcess.TabIndex = 4;
             this.listBoxProcess.SelectedIndexChanged += new System.EventHandler(this.listBoxProcess_SelectedIndexChanged);
             this.listBoxProcess.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listBoxProcess_KeyDown);
             this.listBoxProcess.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBoxProcess_MouseDoubleClick);
             // 
-            // btnAttach
+            // panel1
             // 
-            this.btnAttach.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAttach.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnAttach.Enabled = false;
-            this.btnAttach.Location = new System.Drawing.Point(329, 306);
-            this.btnAttach.Name = "btnAttach";
-            this.btnAttach.Size = new System.Drawing.Size(75, 23);
-            this.btnAttach.TabIndex = 5;
-            this.btnAttach.Text = "A&ttach";
-            this.btnAttach.UseVisualStyleBackColor = true;
-            this.btnAttach.Click += new System.EventHandler(this.btnAttach_Click);
+            this.panel1.Controls.Add(this.groupBox1);
+            this.panel1.Controls.Add(this.txtSearchProcess);
+            this.panel1.Controls.Add(this.listBoxProcess);
+            this.panel1.Controls.Add(this.checkBoxExcludeMSharp);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(606, 363);
+            this.panel1.TabIndex = 10;
             // 
-            // btnAttachToAll
+            // groupBox1
             // 
-            this.btnAttachToAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAttachToAll.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnAttachToAll.Location = new System.Drawing.Point(410, 306);
-            this.btnAttachToAll.Name = "btnAttachToAll";
-            this.btnAttachToAll.Size = new System.Drawing.Size(104, 23);
-            this.btnAttachToAll.TabIndex = 6;
-            this.btnAttachToAll.Text = "Attach to &All";
-            this.btnAttachToAll.UseVisualStyleBackColor = true;
-            this.btnAttachToAll.Click += new System.EventHandler(this.btnAttachToAll_Click);
-            // 
-            // btnRefresh
-            // 
-            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRefresh.Location = new System.Drawing.Point(520, 306);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(70, 23);
-            this.btnRefresh.TabIndex = 7;
-            this.btnRefresh.Text = "&Refresh";
-            this.btnRefresh.UseVisualStyleBackColor = true;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-            // 
-            // btnOriginal
-            // 
-            this.btnOriginal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOriginal.Location = new System.Drawing.Point(8, 306);
-            this.btnOriginal.Name = "btnOriginal";
-            this.btnOriginal.Size = new System.Drawing.Size(180, 23);
-            this.btnOriginal.TabIndex = 8;
-            this.btnOriginal.Text = "Original Attach to &Process...";
-            this.btnOriginal.UseVisualStyleBackColor = true;
-            this.btnOriginal.Click += new System.EventHandler(this.btnOriginal_Click);
-            // 
-            // checkBoxExcludeMSharp
-            // 
-            this.checkBoxExcludeMSharp.AutoSize = true;
-            this.checkBoxExcludeMSharp.Checked = true;
-            this.checkBoxExcludeMSharp.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxExcludeMSharp.Location = new System.Drawing.Point(510, 9);
-            this.checkBoxExcludeMSharp.Name = "checkBoxExcludeMSharp";
-            this.checkBoxExcludeMSharp.Size = new System.Drawing.Size(83, 17);
-            this.checkBoxExcludeMSharp.TabIndex = 9;
-            this.checkBoxExcludeMSharp.Text = "Exclude M#";
-            this.checkBoxExcludeMSharp.UseVisualStyleBackColor = true;
-            this.checkBoxExcludeMSharp.CheckedChanged += new System.EventHandler(this.checkBoxExcludeMSharp_CheckedChanged);
-            // 
-            // txtSearchProcess
-            // 
-            this.txtSearchProcess.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.txtSearchProcess.Location = new System.Drawing.Point(8, 6);
-            this.txtSearchProcess.Name = "txtSearchProcess";
-            this.txtSearchProcess.Size = new System.Drawing.Size(496, 20);
-            this.txtSearchProcess.TabIndex = 10;
-            this.txtSearchProcess.TextChanged += new System.EventHandler(this.txtSearchProcess_TextChanged);
-            // 
-            // tabControl
-            // 
-            this.tabControl.Controls.Add(this.tbpgWorkers);
-            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl.Location = new System.Drawing.Point(0, 0);
-            this.tabControl.Name = "tabControl";
-            this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(606, 363);
-            this.tabControl.TabIndex = 4;
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.btnAttach);
+            this.groupBox1.Controls.Add(this.btnAttachToAll);
+            this.groupBox1.Controls.Add(this.btnRefresh);
+            this.groupBox1.Controls.Add(this.btnOriginal);
+            this.groupBox1.Location = new System.Drawing.Point(12, 295);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(582, 65);
+            this.groupBox1.TabIndex = 11;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Operations";
             // 
             // FormAttacher
             // 
@@ -185,9 +185,10 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 385);
-            this.Controls.Add(this.tabControl);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.statusBar);
             this.KeyPreview = true;
+            this.MinimumSize = new System.Drawing.Size(622, 424);
             this.Name = "FormAttacher";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Attach to w3wp processes";
@@ -195,9 +196,9 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormAttacher_KeyDown);
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
-            this.tbpgWorkers.ResumeLayout(false);
-            this.tbpgWorkers.PerformLayout();
-            this.tabControl.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -207,7 +208,6 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         System.ComponentModel.BackgroundWorker ProcessListLoader;
         System.Windows.Forms.StatusStrip statusBar;
         System.Windows.Forms.ToolStripStatusLabel lblStatus;
-        private System.Windows.Forms.TabPage tbpgWorkers;
         private System.Windows.Forms.TextBox txtSearchProcess;
         private System.Windows.Forms.CheckBox checkBoxExcludeMSharp;
         private System.Windows.Forms.Button btnOriginal;
@@ -215,6 +215,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         private System.Windows.Forms.Button btnAttachToAll;
         private System.Windows.Forms.Button btnAttach;
         private System.Windows.Forms.ListBox listBoxProcess;
-        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

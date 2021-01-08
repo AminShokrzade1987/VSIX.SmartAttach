@@ -65,6 +65,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             {
             }
         }
+
         public static ProcHolder CheckAndAddProcHolder(EnvDTE80.Process2 process)
         {
             ProcHolder returnProcessHolder = null;
@@ -72,6 +73,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             try
             {
                 if (process == null) return null;
+                if (process.Name.Contains("dotnet.exe")) return null;
 
                 var startTime = ExcludedProcessesManager.CheckAndReturnStartTime(process);
                 var ProcessPath = process.Name;
@@ -109,11 +111,22 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         public override string ToString()
         {
             if (Process == null) return "NULL";
-
+            string Str2 = null;
             if (StartTime.HasValue == false)
                 return string.Format("{1} ({0}) ({2})", Process.ProcessID, AppPool, Process.TransportQualifier, Process.Name).Replace("Geeks@", "");
-
-            return AppPool.PadRight(25, ' ') + (string.Format(" ({0}: {1})", Process.ProcessID, MSharp::System.MSharpExtensions.ToTimeDifferenceString(StartTime.Value, 1)).Remove("Geeks@")).PadRight(35, ' ') + Process.Name;
+            string Result = AppPool.PadRight(25, ' ');
+            try
+            {
+                Str2 = string.Format(" ({0}: {1})", Process.ProcessID, MSharp::System.MSharpExtensions.ToTimeDifferenceString(StartTime.Value, 1)).Remove("Geeks@");
+            }
+            catch
+            {
+                return string.Format("{1} ({0}) ({2})", Process.ProcessID, AppPool, Process.TransportQualifier, Process.Name).Replace("Geeks@", "");
+            }
+            Str2 = Str2.PadRight(35, ' ');
+            Result += Str2;
+            Result += Process.Name;
+            return Result;
         }
 
         string GetAppPool(string fullCommandLine)
@@ -165,10 +178,11 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                 {
                     var windowtitle = tp.MainWindowTitle;
 
-                    if (windowtitle != null) title += " >> " + windowtitle;
+                    if (!(string.IsNullOrEmpty(windowtitle) || string.IsNullOrWhiteSpace(windowtitle))) title += " >> " + windowtitle;
                 }
                 catch
                 {
+
                 }
 
                 return $"dotnet[\"{title}\"]";

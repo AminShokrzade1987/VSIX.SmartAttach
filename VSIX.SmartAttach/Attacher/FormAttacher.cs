@@ -43,22 +43,147 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         }
 
         Task flushTask;
+        //void RefreshList()
+        //{
+        //    listBoxProcess.SafeAction(l => l.Items.Clear());
+
+        //    var solutionName = Utils.GetSolutionName(DTE).ToLower();
+
+        //    //var nominatedForSelection = -1;
+        //    //var lengthOfLastNomination = 0;
+        //    List<Process2> processes = new List<Process2>();
+        //    List<ProcHolder> procHolders = new List<ProcHolder>();
+
+        //    //int index = 0;
+        //    using (var iis = new IIS())
+        //    {
+        //        processes = GetWorkerProcesses().OfType<EnvDTE80.Process2>().ToList();
+
+        //        processes = RemoveInvalidProcesses(processes);
+
+        //        if (CheckUser(processes) == false) return;
+
+        //        if (flushTask != null) Task.WaitAll(flushTask);
+
+        //        procHolders =
+        //            processes
+        //            .AsParallel()
+        //            .Select(proc => ProcHolder.CheckAndAddProcHolder(proc))
+        //            .Where(proc => proc != null)
+        //            .OrderByDescending(proc => proc.StartTime)
+        //            .ToList();
+
+        //        flushTask = Task.Run(() => ProcHolder.ExcludedProcessesManager.Flush());
+
+        //        foreach (ProcHolder holder in procHolders)
+        //        {
+        //            if ((checkBoxExcludeMSharp.Checked && holder.AppPool != null && !holder.AppPool.Contains("M#")) || (!checkBoxExcludeMSharp.Checked))
+        //            {
+        //                if (!ProcSession.ValidProcesses.Any(x => x.Process.ProcessID == holder.Process.ProcessID))
+        //                    ProcSession.ValidProcesses.Add(holder);
+        //                listBoxProcess.SafeAction(l => l.Items.Add(holder));
+        //            }
+
+        //            //if (solutionName.HasValue())
+        //            //{
+        //            //    var physicalPath = iis.GetPhysicalPath(holder.AppPool);
+        //            //    if (physicalPath != null && physicalPath.ToLower().Contains(solutionName))
+        //            //    {
+        //            //        if (nominatedForSelection == -1)
+        //            //        {
+        //            //            nominatedForSelection = index;
+        //            //            lengthOfLastNomination = holder.AppPool.Length;
+        //            //        }
+        //            //        else if (holder.AppPool.Length < lengthOfLastNomination)
+        //            //        {
+        //            //            nominatedForSelection = index;
+        //            //            lengthOfLastNomination = holder.AppPool.Length;
+        //            //        }
+        //            //    }
+        //            //}
+
+        //            //index++;
+        //        }
+
+        //    }
+
+        //    var count = listBoxProcess.SafeGet(() => listBoxProcess.Items.Count);
+        //    if (count == 0)
+        //        btnAttachToAll.SafeAction(b => b.Enabled = false);
+
+        //    this.SafeAction(f => f.ActiveControl = listBoxProcess);
+        //    //if (nominatedForSelection <= count - 1)
+        //    //    listBoxProcess.SafeAction(l => l.SelectedIndex = nominatedForSelection);
+
+        //    DTE.StatusBar.Text = "Ready.";
+        //    lblStatus.SafeAction(statusBar, s => s.Text = "");
+
+        //    ProcSession.InvalidProcesses.Clear();
+        //    foreach (var InvalidProc in processes)
+        //    {
+        //        if (InvalidProc != null && !(procHolders.Any(x => x.Process.ProcessID == InvalidProc.ProcessID)))
+        //        {
+        //            ProcSession.InvalidProcesses.Add(InvalidProc);
+        //        }
+        //    }
+        //}
+
         void RefreshList()
         {
             listBoxProcess.SafeAction(l => l.Items.Clear());
 
-            var solutionName = Utils.GetSolutionName(DTE).ToLower();
+            List<Process2> processes = GetWorkerProcesses().OfType<EnvDTE80.Process2>().ToList();
 
-            var nominatedForSelection = -1;
-            var lengthOfLastNomination = 0;
+            List<Process2> CatchedProcesses = new List<Process2>();
+            if (ProcSession.ValidProcesses != null && ProcSession.ValidProcesses.Count > 0)
+            {
+                ProcSession.ValidProcesses.ForEach(x => { var Prox = processes.Where(y => y.ProcessID == x.Process.ProcessID).FirstOrDefault(); if (Prox != null) CatchedProcesses.Add(Prox); });
+                if (CatchedProcesses != null && CatchedProcesses.Count > 0)
+                {
+                    AddProcessToListShow(CatchedProcesses);
+                }
+            }
 
-            var index = 0;
+            var count = listBoxProcess.SafeGet(() => listBoxProcess.Items.Count);
+            if (count == 0)
+                btnAttachToAll.SafeAction(b => b.Enabled = false);
+
+            AddProcessToListShow(processes);
+
+
+            count = listBoxProcess.SafeGet(() => listBoxProcess.Items.Count);
+            if (count == 0)
+                btnAttachToAll.SafeAction(b => b.Enabled = false);
+
+            this.SafeAction(f => f.ActiveControl = listBoxProcess);
+            DTE.StatusBar.Text = "Ready.";
+            lblStatus.SafeAction(statusBar, s => s.Text = "");
+
+            ProcSession.ValidProcesses.Clear();
+            if (listBoxProcess.Items != null && listBoxProcess.Items.Count > 0)
+            {
+                foreach (var Item in listBoxProcess.Items)
+                {
+                    ProcSession.ValidProcesses.Add(((ProcHolder)(Item)));
+                }
+            }
+
+            ProcSession.InvalidProcesses.Clear();
+
+            //foreach (var InvalidProc in processes)
+            //{
+            //    if (InvalidProc != null && !(procHolders.Any(x => x.Process.ProcessID == InvalidProc.ProcessID)))
+            //    {
+            //        ProcSession.InvalidProcesses.Add(InvalidProc);
+            //    }
+            //}
+        }
+
+        private void AddProcessToListShow(List<Process2> processes)
+        {
             using (var iis = new IIS())
             {
-                var processes = GetWorkerProcesses().OfType<EnvDTE80.Process2>().ToList();
                 if (CheckUser(processes) == false) return;
-
-                if (flushTask != null) Task.WaitAll(flushTask);
 
                 var procHolders =
                     processes
@@ -68,47 +193,47 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                     .OrderByDescending(proc => proc.StartTime)
                     .ToList();
 
-                flushTask = Task.Run(() => ProcHolder.ExcludedProcessesManager.Flush());
-
                 foreach (ProcHolder holder in procHolders)
                 {
                     if ((checkBoxExcludeMSharp.Checked && holder.AppPool != null && !holder.AppPool.Contains("M#")) || (!checkBoxExcludeMSharp.Checked))
                     {
-                        listBoxProcess.SafeAction(l => l.Items.Add(holder));
-                    }
-
-                    if (solutionName.HasValue())
-                    {
-                        var physicalPath = iis.GetPhysicalPath(holder.AppPool);
-                        if (physicalPath != null && physicalPath.ToLower().Contains(solutionName))
+                        bool AlreadyExists = false;
+                        if (listBoxProcess.Items != null && listBoxProcess.Items.Count > 0)
                         {
-                            if (nominatedForSelection == -1)
+                            foreach (var Item in listBoxProcess.Items)
                             {
-                                nominatedForSelection = index;
-                                lengthOfLastNomination = holder.AppPool.Length;
-                            }
-                            else if (holder.AppPool.Length < lengthOfLastNomination)
-                            {
-                                nominatedForSelection = index;
-                                lengthOfLastNomination = holder.AppPool.Length;
+                                if (((ProcHolder)(Item)).Process.ProcessID == holder.Process.ProcessID)
+                                {
+                                    AlreadyExists = true;
+                                    break;
+                                }
                             }
                         }
+                        if (!AlreadyExists)
+                            listBoxProcess.SafeAction(l => l.Items.Add(holder));
                     }
-
-                    index++;
                 }
             }
+        }
 
-            var count = listBoxProcess.SafeGet(() => listBoxProcess.Items.Count);
-            if (count == 0)
-                btnAttachToAll.SafeAction(b => b.Enabled = false);
+        private List<Process2> RemoveInvalidProcesses(List<Process2> AllProcesses)
+        {
+            List<Process2> Result = new List<Process2>();
+            AllProcesses.ForEach(x => { if (!ProcSession.InvalidProcesses.Any(y => y.ProcessID == x.ProcessID)) Result.Add(x); });
+            return Result;
+        }
 
-            this.SafeAction(f => f.ActiveControl = listBoxProcess);
-            if (nominatedForSelection <= count - 1)
-                listBoxProcess.SafeAction(l => l.SelectedIndex = nominatedForSelection);
+        public void UpdateInvalidProcesses(List<Process2> AllProcesses)
+        {
 
-            DTE.StatusBar.Text = "Ready.";
-            lblStatus.SafeAction(statusBar, s => s.Text = "");
+        }
+
+
+        private bool IsStillValid()
+        {
+            bool Result = true;
+
+            return Result;
         }
 
         bool CheckUser(List<Process2> processes)
@@ -179,6 +304,9 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                 }
             }
         }
+
+
+
 
         static IOrderedEnumerable<string> GetRemoteMachineNames(string machinesString)
         {
@@ -327,7 +455,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         {
             if (e.KeyData != Keys.Delete) return;
 
-            if (tabControl.SelectedTab == tbpgWorkers) KillSelected();
+            //if (tabControl.SelectedTab == tbpgWorkers) KillSelected();
             //if (tabControl.SelectedTab == tbpgRemoteMachines) DeleteCurrentRemoteMachine();
         }
 

@@ -97,11 +97,15 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         public DateTime? CheckAndReturnStartTime(EnvDTE80.Process2 prc)
         {
             var processFullName = prc.Name.ToLower();
+            if (processFullName.Contains("test") || processFullName.Contains("test"))
+            {
+
+            }
 
             if (IsEnabled)
             {
-
-                if (ExcludedNoneDotNetProcesses.Any(x => x.ToLower() == processFullName)) return null;
+                var tp = Process.GetProcessById(prc.ProcessID);
+                if (ExcludedNoneDotNetProcesses.Any(x => x.ToLower() == processFullName) && !IsCoreProcess(tp, processFullName)) return null;
             }
 
             if (ExcludedProcessNames.Any(x => prc.Name.ToLower().StartsWith(x))) return null;
