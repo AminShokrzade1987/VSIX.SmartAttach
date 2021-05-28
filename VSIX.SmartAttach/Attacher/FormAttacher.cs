@@ -10,6 +10,8 @@ using Geeks.VSIX.SmartAttach.Base;
 using Geeks.VSIX.SmartAttach.Properties;
 using GeeksAddin;
 using System.IO;
+using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace Geeks.VSIX.SmartAttach.Attacher
 {
@@ -130,14 +132,20 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
         void RefreshList()
         {
+            List<Process2> CatchedProcesses = new List<Process2>();
             listBoxProcess.SafeAction(l => l.Items.Clear());
+            if (ProcSession.ValidProcesses != null && ProcSession.ValidProcesses.Count > 0)
+            {
+                ProcSession.ValidProcesses.ForEach(x => CatchedProcesses.Add(x.Process));
+                AddProcessToListShow(CatchedProcesses);
+            }
 
             List<Process2> processes = GetWorkerProcesses().OfType<EnvDTE80.Process2>().ToList();
-
-            List<Process2> CatchedProcesses = new List<Process2>();
+            CatchedProcesses.Clear();
             if (ProcSession.ValidProcesses != null && ProcSession.ValidProcesses.Count > 0)
             {
                 ProcSession.ValidProcesses.ForEach(x => { var Prox = processes.Where(y => y.ProcessID == x.Process.ProcessID).FirstOrDefault(); if (Prox != null) CatchedProcesses.Add(Prox); });
+                listBoxProcess.SafeAction(l => l.Items.Clear());
                 if (CatchedProcesses != null && CatchedProcesses.Count > 0)
                 {
                     AddProcessToListShow(CatchedProcesses);
@@ -262,7 +270,11 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             lblStatus.SafeAction(statusBar, s => s.Text = "Loading Local processes...");
 
             foreach (EnvDTE.Process p in DTE.Debugger.LocalProcesses)
-                yield return p;
+            {
+                string ProcPath = p.Name;
+                if (p.DTE.FileName != null && (!ProcPath.StartsWith(@"C:\Windows") || (ProcPath.StartsWith(@"C:\Windows") && ProcPath.ToLower().Contains("w3wp.exe"))) && !ProcPath.StartsWith(@"C:\Program Files") && !ProcPath.StartsWith(@"C:\Program Files (x86)"))
+                    yield return p;
+            }
 
             var machinesString = Settings.Default.RemoteMachines;
             if (machinesString.HasValue())
@@ -298,7 +310,11 @@ namespace Geeks.VSIX.SmartAttach.Attacher
                     if (processes != null)
                     {
                         foreach (EnvDTE.Process p in processes)
-                            yield return p;
+                        {
+                            string ProcPath = p.Name;
+                            if (p.DTE.FileName != null && !(ProcPath.StartsWith(@"C:\Windows") && ProcPath.ToLower().Contains("w3wp.exe")) && !ProcPath.StartsWith(@"C:\Program Files") && !ProcPath.StartsWith(@"C:\Program Files (x86)"))
+                                yield return p;
+                        }
 
                     }
                 }

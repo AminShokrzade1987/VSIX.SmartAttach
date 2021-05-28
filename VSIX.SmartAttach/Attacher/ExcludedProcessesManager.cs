@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace Geeks.VSIX.SmartAttach.Attacher
 {
@@ -18,8 +22,8 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         {
             "ServiceHub".ToLower(),
             "Microsoft".ToLower(),
-            "iisexpresstray".ToLower(),
-            "devenv".ToLower(),
+            //"iisexpresstray".ToLower(),
+            //"devenv".ToLower(),
             "IntelliTrace.exe".ToLower(),
             "Msbuild.exe".ToLower(),
             "MSBuildWatcher.exe".ToLower(),
@@ -28,7 +32,11 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             "PerfWatson2.exe".ToLower(),
             "ssms.exe".ToLower(),
             "vsixinstaller.exe".ToLower(),
-            "xamarin.simulator.windows.exe".ToLower()
+            "xamarin.simulator.windows.exe".ToLower(),
+            "SourceTree.exe".ToLower(),
+            "Docker Desktop.exe".ToLower(),
+            "com.docker.service".ToLower(),
+            "VBCSCompiler.exe".ToLower(),
         };
 
         static readonly string[] ExcludedProcessNames_WithCommpandLine = new[] { "C:\\program files (x86)\\".ToLower() };
@@ -40,6 +48,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         static Lazy<List<string>> excludedNoneDotNetProcesses =
             new Lazy<List<string>>(() =>
             {
+
                 if (!ShouldWrtieToSetting && !ShouldWrtieToFile) return new List<string>();
 
                 if (ShouldWrtieToSetting)
@@ -64,15 +73,48 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             try
             {
                 if (processFullName.Contains("dotnet.exe")) return true;
-                var modules = process.Modules.Cast<ProcessModule>().Where(
-                m => m.ModuleName.StartsWith("mscor", StringComparison.InvariantCultureIgnoreCase));
+                List<string> Modules = new List<string>();
 
+                // try get modules from x86 app by default
+                try
+                {
+                    foreach (ProcessModule Module in process.Modules)
+                    {
+                        Modules.Add(Module.ModuleName);
+                    }
+                }
+                catch
+                {
+
+                }
+
+                // get modules from x64 app
+                if (Modules.Count <= 0)
+                {
+                    String ExePath = Path.Combine(Path.GetTempPath(), "ModuleEnumerator.exe");
+                    if (!File.Exists(ExePath))
+                    {
+                        byte[] ExeContent = Resources.ModuleEnumerator;
+                        File.WriteAllBytes(ExePath, ExeContent);
+                    }
+
+                    Process Prs = new Process();
+                    Prs.StartInfo.FileName = ExePath;
+                    Prs.StartInfo.Arguments = process.Id.ToString();
+                    Prs.StartInfo.UseShellExecute = false;
+                    Prs.StartInfo.CreateNoWindow = true;
+                    Prs.StartInfo.RedirectStandardOutput = true;
+                    Prs.Start();
+                    string output = Prs.StandardOutput.ReadToEnd();
+                    Modules = output.Split(',').ToList();
+                    Prs.WaitForExit();
+                }
+                var modules = Modules.Where(m => m.StartsWith("mscor", StringComparison.InvariantCultureIgnoreCase));
                 return modules.Any();
             }
             catch (Exception e)
             {
-                AddExcludedNoneDotNetProcesses(processFullName);
-
+                //AddExcludedNoneDotNetProcesses(processFullName);
                 return false;
             }
         }
@@ -81,15 +123,49 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         {
             try
             {
-                var modules = process.Modules.Cast<ProcessModule>().Where(
-                m => m.ModuleName.StartsWith("coreclr", StringComparison.InvariantCultureIgnoreCase));
+                List<string> Modules = new List<string>();
 
+                // try get modules from x86 app by default
+                try
+                {
+                    foreach (ProcessModule Module in process.Modules)
+                    {
+                        Modules.Add(Module.ModuleName);
+                    }
+                }
+                catch
+                {
+
+                }
+
+
+                // get modules from x64 app
+                if (Modules.Count <= 0)
+                {
+                    String ExePath = Path.Combine(Path.GetTempPath(), "ModuleEnumerator.exe");
+                    if (!File.Exists(ExePath))
+                    {
+                        byte[] ExeContent = Resources.ModuleEnumerator;
+                        File.WriteAllBytes(ExePath, ExeContent);
+                    }
+
+                    Process Prs = new Process();
+                    Prs.StartInfo.FileName = ExePath;
+                    Prs.StartInfo.Arguments = process.Id.ToString();
+                    Prs.StartInfo.UseShellExecute = false;
+                    Prs.StartInfo.CreateNoWindow = true;
+                    Prs.StartInfo.RedirectStandardOutput = true;
+                    Prs.Start();
+                    string output = Prs.StandardOutput.ReadToEnd();
+                    Modules = output.Split(',').ToList();
+                    Prs.WaitForExit();
+                }
+                var modules = Modules.Where(m => m.StartsWith("coreclr", StringComparison.InvariantCultureIgnoreCase));
                 return modules.Any();
             }
             catch (Exception e)
             {
-                AddExcludedNoneDotNetProcesses(processFullName);
-
+                //AddExcludedNoneDotNetProcesses(processFullName);
                 return false;
             }
         }
@@ -97,10 +173,10 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         public DateTime? CheckAndReturnStartTime(EnvDTE80.Process2 prc)
         {
             var processFullName = prc.Name.ToLower();
-            if (processFullName.Contains("test") || processFullName.Contains("test"))
-            {
+            //if (processFullName.Contains("test") || processFullName.Contains("test"))
+            //{
 
-            }
+            //}
 
             if (IsEnabled)
             {
@@ -126,7 +202,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
                 return tp.StartTime;
             }
-            catch
+            catch (Exception ex)
             {
             }
 

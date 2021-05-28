@@ -74,7 +74,6 @@ namespace Geeks.VSIX.SmartAttach.Attacher
             {
                 if (process == null) return null;
                 if (process.Name.Contains("dotnet.exe")) return null;
-
                 var startTime = ExcludedProcessesManager.CheckAndReturnStartTime(process);
                 var ProcessPath = process.Name;
 
@@ -101,7 +100,7 @@ namespace Geeks.VSIX.SmartAttach.Attacher
 
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
 
@@ -111,22 +110,62 @@ namespace Geeks.VSIX.SmartAttach.Attacher
         public override string ToString()
         {
             if (Process == null) return "NULL";
-            string Str2 = null;
-            if (StartTime.HasValue == false)
-                return string.Format("{1} ({0}) ({2})", Process.ProcessID, AppPool, Process.TransportQualifier, Process.Name).Replace("Geeks@", "");
-            string Result = AppPool.PadRight(25, ' ');
+
             try
             {
-                Str2 = string.Format(" ({0}: {1})", Process.ProcessID, MSharp::System.MSharpExtensions.ToTimeDifferenceString(StartTime.Value, 1)).Remove("Geeks@");
+                if (AppPool.ToLower() != "website.exe")
+                    return (AppPool.PadRight(30, ' ') + Process.ProcessID.ToString().PadRight(8, ' ') + Process.Name).Replace("Geeks@", "");
+                else
+                {
+                    string ProcName = null;
+                    int EndIndex = Process.Name.ToLower().IndexOf(@"\website\bin\");
+
+                    if (EndIndex < 0)
+                    {
+                        return (AppPool.PadRight(30, ' ') + Process.ProcessID.ToString().PadRight(8, ' ') + Process.Name).Replace("Geeks@", "");
+                    }
+                    int StartIndex = EndIndex-1;
+                    while(StartIndex>0 && Process.Name[StartIndex-1] != '\\')
+                    {
+                        StartIndex--;
+                    }
+                    ProcName = Process.Name.Substring(StartIndex, EndIndex - StartIndex);
+
+                    return ((string.Format("{0} ({1})",ProcName,Path.GetFileNameWithoutExtension(AppPool))).PadRight(30, ' ') + Process.ProcessID.ToString().PadRight(8, ' ') + Process.Name).Replace("Geeks@", "");
+                }
             }
             catch
             {
-                return string.Format("{1} ({0}) ({2})", Process.ProcessID, AppPool, Process.TransportQualifier, Process.Name).Replace("Geeks@", "");
+                return "NULL";
             }
-            Str2 = Str2.PadRight(35, ' ');
-            Result += Str2;
-            Result += Process.Name;
-            return Result;
+
+            //string Str2 = null;
+            //if (StartTime.HasValue == false)
+            //{
+            //    return (AppPool.PadRight(20, ' ') + Process.ProcessID.ToString().PadRight(28, ' ') + Process.Name).Replace("Geeks@", "");
+            //    //return string.Format("{1} ({0}) ({2}) ({3})", Process.ProcessID, AppPool, Process.TransportQualifier, Process.Name).Replace("Geeks@", "");
+            //}
+            //string Result = AppPool.PadRight(25, ' ');
+            //try
+            //{
+            //    Str2 = string.Format("{0} {1} {2}", Process.ProcessID, MSharp::System.MSharpExtensions.ToTimeDifferenceString(StartTime.Value, 1)).Remove("Geeks@");
+            //}
+            //catch
+            //{
+            //    //Str2= string.Format("{1} ({0}) ({2}) ({3})", Process.ProcessID+ Str2.PadRight(35, ' '), AppPool+ Str2.PadRight(35, ' '), Process.TransportQualifier + Str2.PadRight(35, ' '), Process.Name).Replace("Geeks@", "");
+            //    Str2 = (AppPool.PadRight(20, ' ') + Process.ProcessID.ToString().PadRight(28, ' ') + Process.Name).Replace("Geeks@", "");
+            //    //Str2 = Str2.PadRight(20, ' ');
+            //    //Str2 += Process.ProcessID;
+            //    //Str2 = Str2.PadRight(28, ' ');
+            //    //Str2 += Process.TransportQualifier + "   ";
+            //    //Str2 += Process.Name;
+            //    //Str2 = Str2.Replace("Geeks@", "");
+            //    return Str2;
+            //}
+            //Str2 = Str2.PadRight(35, ' ');
+            //Result += Str2;
+            //Result += Process.Name;
+            //return Result;
         }
 
         string GetAppPool(string fullCommandLine)
